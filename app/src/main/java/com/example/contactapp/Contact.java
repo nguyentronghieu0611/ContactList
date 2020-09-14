@@ -13,4 +13,12 @@ public class Contact {
         this.email = email;
         this.image = image;
     }
+
+    public Contact(Integer id,String name, String phonenummber, String email, byte[] image) {
+        this.id = id;
+        this.name = name;
+        this.phonenummber = phonenummber;
+        this.email = email;
+        this.image = image;
+    }
 }

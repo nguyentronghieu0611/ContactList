@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#303030"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <TextView
+        android:gravity="center"
+        android:layout_margin="7dp"
+        android:id="@+id/txtIcon"
+        android:textStyle="bold"
+        android:textColor="#FFFFFF"
+        android:textSize="20dp"
+        android:text="H"
+        android:background="@drawable/circle"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        android:layout_width="60sp"
+        android:layout_height="60sp"/>
+
+    <TextView
+        android:id="@+id/txtContactName"
+        android:layout_margin="7dp"
+        android:textSize="20dp"
+        android:textColor="#FFFFFF"
+        android:text="Nguyen Trung Lap"
+        android:gravity="center_vertical"
+        app:layout_constraintLeft_toRightOf="@id/txtIcon"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        android:layout_width="0dp"
+        android:layout_height="60sp"/>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

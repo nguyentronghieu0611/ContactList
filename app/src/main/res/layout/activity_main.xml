@@ -4,9 +4,15 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="#303030"
+    android:id="@+id/layout_main"
     tools:context=".MainActivity">
 
+
+
     <ListView
+        android:divider="@android:color/transparent"
+        android:dividerHeight="8dip"
         android:id="@+id/lvContact"
         android:layout_width="match_parent"
         android:layout_height="match_parent"/>
@@ -22,5 +28,10 @@
         android:tint="#FFFFFF"
         app:backgroundTint="#FF5722"
         app:fabSize="auto" />
+
+    <FrameLayout
+        android:id="@+id/fragmentContact"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"/>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
