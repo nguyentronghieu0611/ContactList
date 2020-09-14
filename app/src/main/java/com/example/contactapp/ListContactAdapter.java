@@ -1,5 +1,6 @@
 package com.example.contactapp;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.graphics.Color;
 import android.graphics.drawable.GradientDrawable;
@@ -9,8 +10,12 @@ import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.TextView;
 
+import com.bumptech.glide.Glide;
+
 import java.util.List;
 import java.util.Random;
+
+import de.hdodenhof.circleimageview.CircleImageView;
 
 public class ListContactAdapter extends BaseAdapter {
     private List<Contact> contactList;
@@ -38,6 +43,7 @@ public class ListContactAdapter extends BaseAdapter {
         return contactList.get(i).id;
     }
 
+    @SuppressLint("CheckResult")
     @Override
     public View getView(int i, View convertView, ViewGroup viewGroup) {
         ViewHolder holder;
@@ -51,6 +57,7 @@ public class ListContactAdapter extends BaseAdapter {
             holder.color = Color.parseColor(colors[i1]);
             holder.txtIcon = (TextView) convertView.findViewById(R.id.txtIcon);
             holder.txtContactName = (TextView) convertView.findViewById(R.id.txtContactName);
+            holder.imageView = convertView.findViewById(R.id.imgAvatar);
             draw.setColor(holder.color);
             holder.txtIcon.setBackground(draw);
             convertView.setTag(holder);
@@ -59,8 +66,17 @@ public class ListContactAdapter extends BaseAdapter {
         }
 
         Contact contact = this.contactList.get(i);
-        holder.txtIcon.setText(contact.name.substring(0,1).toUpperCase());
         holder.txtContactName.setText(contact.name);
+        if (contact.image != null){
+            Glide.with(context).load(contact.image).centerCrop().into(holder.imageView);
+            holder.imageView.setVisibility(View.VISIBLE);
+            holder.txtIcon.setVisibility(View.INVISIBLE);
+
+        }else{
+            holder.txtIcon.setVisibility(View.VISIBLE);
+            holder.imageView.setVisibility(View.INVISIBLE);
+            holder.txtIcon.setText(contact.name.substring(0,1).toUpperCase());
+        }
         return convertView;
     }
 
@@ -68,5 +84,6 @@ public class ListContactAdapter extends BaseAdapter {
     static class ViewHolder{
         int color;
         TextView txtIcon, txtContactName;
+        CircleImageView imageView;
     }
 }
