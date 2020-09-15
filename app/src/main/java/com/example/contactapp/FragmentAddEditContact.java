@@ -1,5 +1,6 @@
 package com.example.contactapp;
 
+import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.net.Uri;
@@ -23,6 +24,7 @@ import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.cardview.widget.CardView;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentTransaction;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -30,13 +32,14 @@ import java.util.Objects;
 
 import static android.app.Activity.RESULT_OK;
 
-public class FragmentAddEditContact extends Fragment {
+public class FragmentAddEditContact extends Fragment{
     Contact contact;
     ImageView imgAvatar;
     EditText edtName, edtPhone, edtEmail;
     private byte[] image;
     private final int PICK_IMAGE = 1997;
     private ContactDatabase contactDatabase;
+    OnChangeContact changeContact;
 
     public FragmentAddEditContact(Contact contact,ContactDatabase contactDatabase) {
         this.contact = contact;
@@ -61,7 +64,6 @@ public class FragmentAddEditContact extends Fragment {
     private void initControl(final View view){
         ActionBar actionBar = ((AppCompatActivity)getActivity()).getSupportActionBar();
         assert actionBar != null;
-        actionBar.setIcon(R.drawable.ic_complete);
         imgAvatar = view.findViewById(R.id.imgAvatar);
         edtName = view.findViewById(R.id.edtName);
         edtPhone = view.findViewById(R.id.edtPhone);
@@ -91,7 +93,7 @@ public class FragmentAddEditContact extends Fragment {
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         int menuID = item.getItemId();
-        if(menuID == R.id.btnAddDone){
+        if(menuID == R.id.btnAddDone && contact==null){
             final Contact contact = new Contact(
                   edtName.getText().toString(),
                   edtPhone.getText().toString(),
@@ -100,6 +102,21 @@ public class FragmentAddEditContact extends Fragment {
             );
             if(contactDatabase.insertContact(contact) > 0){
                 Toast.makeText(getActivity(),"Thêm dữ liệu thành công",Toast.LENGTH_SHORT).show();
+                changeContact.onChange();
+                getActivity().onBackPressed();
+            }
+        }
+        else if(menuID == R.id.btnAddDone && contact!=null){
+            final Contact contact = new Contact(
+                    edtName.getText().toString(),
+                    edtPhone.getText().toString(),
+                    edtEmail.getText().toString(),
+                    image
+            );
+            if(contactDatabase.updateContact(contact) > 0){
+                Toast.makeText(getActivity(),"Cập nhật dữ liệu thành công",Toast.LENGTH_SHORT).show();
+                changeContact.onChange();
+                getActivity().onBackPressed();
             }
         }
         return super.onOptionsItemSelected(item);
@@ -122,5 +139,11 @@ public class FragmentAddEditContact extends Fragment {
                 e.printStackTrace();
             }
         }
+    }
+
+    @Override
+    public void onAttach(@NonNull Context context) {
+        super.onAttach(context);
+        changeContact = (OnChangeContact) context;
     }
 }

@@ -1,6 +1,8 @@
 package com.example.contactapp;
 
 import android.Manifest;
+import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
@@ -10,16 +12,20 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentTransaction;
 
 public class FragmentDetailContact extends Fragment {
 
@@ -28,10 +34,18 @@ public class FragmentDetailContact extends Fragment {
     TextView txtIcon,txtName,txtPhone,txtEmail;
     private final int REQUEST_CALL_PHONE = 109;
     private final int REQUEST_MESSAGE = 110;
+    ContactDatabase contactDatabase;
+    OnChangeContact changeContact;
 
-
-    public FragmentDetailContact(Contact contact) {
+    public FragmentDetailContact(Contact contact, ContactDatabase contactDatabase) {
         this.contact = contact;
+        this.contactDatabase = contactDatabase;
+    }
+
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setHasOptionsMenu(true);
     }
 
     @Nullable
@@ -44,7 +58,6 @@ public class FragmentDetailContact extends Fragment {
     }
 
     private void initControl(final View view){
-        setHasOptionsMenu(false);
         imgMessage = view.findViewById(R.id.imgMessage);
         imgPhone = view.findViewById(R.id.imgPhone);
         txtName = view.findViewById(R.id.txtName);
@@ -111,5 +124,42 @@ public class FragmentDetailContact extends Fragment {
                 Log.d("TAG", "Send sms Permission Not Granted");
             }
         }
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        int menuID = item.getItemId();
+        if(menuID == R.id.btnEdit){
+            FragmentTransaction t = getFragmentManager().beginTransaction().setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
+            t.add(R.id.fragmentContact, new FragmentAddEditContact(contact,contactDatabase), "TAG");
+            t.addToBackStack(null);
+            t.commit();
+        }
+        else{
+            new AlertDialog.Builder(getContext())
+                    .setIcon(android.R.drawable.ic_dialog_alert)
+                    .setMessage("Bạn có chắc chắn xóa người dùng?")
+                    .setPositiveButton("Có", new DialogInterface.OnClickListener()
+                    {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            int i = contactDatabase.deleteContact(contact);
+                            if(i>0){
+                                Toast.makeText(getContext(),"Xóa thành công",Toast.LENGTH_SHORT).show();
+                                changeContact.onChange();
+                                getActivity().onBackPressed();
+                            }
+                        }
+                    })
+                    .setNegativeButton("Không", null)
+                    .show();
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public void onAttach(@NonNull Context context) {
+        super.onAttach(context);
+        changeContact = (OnChangeContact) context;
     }
 }

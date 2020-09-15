@@ -19,7 +19,7 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import java.util.ArrayList;
 import java.util.List;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements OnChangeContact {
     ContactDatabase db;
     FloatingActionButton btnAdd;
     List<Contact> listContact = new ArrayList<>();
@@ -54,7 +54,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 FragmentTransaction t = fragmentManager.beginTransaction().setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
-                t.replace(R.id.fragmentContact, new FragmentAddEditContact(null,db), "TAG");
+                t.add(R.id.fragmentContact, new FragmentAddEditContact(null,db), "TAG");
                 t.addToBackStack(null);
                 t.commit();
                 type = 2;
@@ -68,7 +68,7 @@ public class MainActivity extends AppCompatActivity {
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
                 Contact contact = listContact.get(i);
                 FragmentTransaction t = fragmentManager.beginTransaction().setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
-                t.add(R.id.fragmentContact, new FragmentDetailContact(contact), "TAG");
+                t.add(R.id.fragmentContact, new FragmentDetailContact(contact,db), "TAG");
                 t.addToBackStack(null);
                 t.commit();
                 type=3;
@@ -105,5 +105,11 @@ public class MainActivity extends AppCompatActivity {
             btnAdd.show();
         }
         super.onBackPressed();
+    }
+
+    @Override
+    public void onChange() {
+        listContact = db.getContact();
+        lvContact.setAdapter(new ListContactAdapter(listContact,this));
     }
 }
