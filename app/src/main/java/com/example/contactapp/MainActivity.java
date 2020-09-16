@@ -26,6 +26,7 @@ public class MainActivity extends AppCompatActivity implements OnChangeContact {
     ListView lvContact;
 //    Toolbar toolbar;
     private int type = 1;
+    private ListContactAdapter listContactAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -40,7 +41,8 @@ public class MainActivity extends AppCompatActivity implements OnChangeContact {
 //        setSupportActionBar(toolbar);
 //        db.insertContact(new Contact("Nguyễn Trọng Hiếu","0334420708","nguyentronghieu0611@gmail.com",null));
         listContact = db.getContact();
-        lvContact.setAdapter(new ListContactAdapter(listContact,this));
+        listContactAdapter = new ListContactAdapter(listContact,this);
+        lvContact.setAdapter(listContactAdapter);
     }
 
     private void initControl(){
@@ -54,7 +56,7 @@ public class MainActivity extends AppCompatActivity implements OnChangeContact {
             @Override
             public void onClick(View view) {
                 FragmentTransaction t = fragmentManager.beginTransaction().setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
-                t.add(R.id.fragmentContact, new FragmentAddEditContact(null,db), "TAG");
+                t.add(R.id.fragmentContact, new FragmentAddEditContact(db), "TAG");
                 t.addToBackStack(null);
                 t.commit();
                 type = 2;
@@ -62,6 +64,7 @@ public class MainActivity extends AppCompatActivity implements OnChangeContact {
                 btnAdd.hide();
             }
         });
+
 
         lvContact.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
@@ -103,6 +106,7 @@ public class MainActivity extends AppCompatActivity implements OnChangeContact {
             type = 1;
             invalidateOptionsMenu();
             btnAdd.show();
+            getSupportActionBar().setTitle("Danh bạ");
         }
         super.onBackPressed();
     }
@@ -111,5 +115,7 @@ public class MainActivity extends AppCompatActivity implements OnChangeContact {
     public void onChange() {
         listContact = db.getContact();
         lvContact.setAdapter(new ListContactAdapter(listContact,this));
+//        listContactAdapter.notifyDataSetChanged();
+        onBackPressed();
     }
 }

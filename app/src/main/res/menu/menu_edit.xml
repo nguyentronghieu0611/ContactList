@@ -1,7 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
-<menu xmlns:android="http://schemas.android.com/apk/res/android">
-    <item android:id="@+id/btnEdit"
-        android:title="Cập nhật thông tin" />
-    <item android:id="@+id/btnDelete"
-        android:title="Xóa người dùng" />
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <item
+        android:id="@+id/btnDelete"
+        android:icon="@drawable/ic_delete"
+        android:title="Xóa người dùng"
+        app:showAsAction="always" />
 </menu>

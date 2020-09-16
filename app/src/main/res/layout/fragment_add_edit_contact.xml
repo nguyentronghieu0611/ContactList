@@ -28,13 +28,37 @@
         android:layout_marginTop="10dp"
         android:gravity="center_horizontal">
 
-        <de.hdodenhof.circleimageview.CircleImageView
-            app:civ_circle_background_color="#E83636"
-            android:id="@+id/imgAvatar"
-            android:layout_width="120dp"
-            android:layout_height="120dp"
-            android:src="@drawable/ic_user"
-            android:scaleType="centerCrop"/>
+        <FrameLayout
+            android:layout_margin="7dp"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            android:id="@+id/layoutLeft"
+            android:layout_width="wrap_content"
+            android:layout_height="120dp">
+
+            <TextView
+                android:id="@+id/txtIcon"
+                android:layout_width="120dp"
+                android:layout_height="120dp"
+                android:background="@drawable/circle"
+                android:gravity="center"
+                android:text="H"
+                android:textColor="#FFFFFF"
+                android:textSize="40dp"
+                android:textStyle="bold" />
+
+
+            <de.hdodenhof.circleimageview.CircleImageView
+                android:visibility="gone"
+                app:civ_circle_background_color="#E83636"
+                android:id="@+id/imgAvatar"
+                android:layout_width="120dp"
+                android:layout_height="120dp"
+                android:src="@drawable/ic_user"
+                android:scaleType="centerCrop"/>
+        </FrameLayout>
+
+
 
     </LinearLayout>
 
