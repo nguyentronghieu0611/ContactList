@@ -1,10 +1,17 @@
 package com.example.contactapp;
 
+import com.google.gson.annotations.SerializedName;
+
 public class Contact {
+    @SerializedName("id")
     public Integer id;
+    @SerializedName("name")
     public String name;
+    @SerializedName("phonenummber")
     public String phonenummber;
+    @SerializedName("email")
     public String email;
+    @SerializedName("image")
     public byte[] image;
 
     public Contact(String name, String phonenummber, String email, byte[] image) {

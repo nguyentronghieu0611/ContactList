@@ -7,6 +7,8 @@ import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 
 import android.os.Bundle;
+import android.os.Environment;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -15,7 +17,11 @@ import android.widget.AdapterView;
 import android.widget.ListView;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.google.gson.Gson;
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -83,6 +89,29 @@ public class MainActivity extends AppCompatActivity implements OnChangeContact {
 
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        int menuId = item.getItemId();
+        if(menuId==R.id.btnSync){
+            String rs = new Gson().toJson(listContact);
+            File dirRoot = Environment.getExternalStorageDirectory();
+            File fileJson = new File(dirRoot + "/contact.txt");
+            FileOutputStream fos = null;
+            try{
+                 fos = new FileOutputStream(fileJson);
+                 fos.write(rs.getBytes());
+            }catch (Exception ignored){
+                Log.e("aa",ignored.toString());
+            }finally {
+                try {
+                    assert fos != null;
+                    fos.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+        else{
+
+        }
         return super.onOptionsItemSelected(item);
     }
 

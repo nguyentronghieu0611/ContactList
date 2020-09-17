@@ -129,10 +129,11 @@ public class FragmentAddEditContact extends Fragment {
             Uri imageUri = data.getData();
             try {
                 final Bitmap bitmapSelection = MediaStore.Images.Media.getBitmap(Objects.requireNonNull(getActivity()).getContentResolver(), imageUri);
+                final Bitmap bitmapScale = Bitmap.createScaledBitmap(bitmapSelection,150, bitmapSelection.getHeight() * 150 / bitmapSelection.getWidth() ,false);
                 ByteArrayOutputStream stream = new ByteArrayOutputStream();
-                bitmapSelection.compress(Bitmap.CompressFormat.PNG, 30, stream);
+                bitmapScale.compress(Bitmap.CompressFormat.PNG, 100, stream);
                 image = stream.toByteArray();
-                imgAvatar.setImageBitmap(bitmapSelection);
+                imgAvatar.setImageBitmap(bitmapScale);
                 imgAvatar.setVisibility(View.VISIBLE);
                 txtIcon.setVisibility(View.GONE);
             } catch (IOException e) {
