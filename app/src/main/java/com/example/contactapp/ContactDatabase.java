@@ -75,6 +75,11 @@ public class ContactDatabase extends SQLiteOpenHelper {
         return sqLiteDatabase.delete("tblContact", "id = ?", new String[]{contact.id.toString()});
     }
 
+    public int deleteAll(){
+        SQLiteDatabase sqLiteDatabase = getWritableDatabase();
+        return sqLiteDatabase.delete("tblContact",null,null);
+    }
+
     public List<Contact> getContact(){
         SQLiteDatabase sqLiteDatabase = getReadableDatabase();
         Cursor c = sqLiteDatabase.rawQuery("Select * from tblContact", null);
