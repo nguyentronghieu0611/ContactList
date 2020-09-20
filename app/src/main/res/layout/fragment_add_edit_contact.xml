@@ -7,21 +7,9 @@
     android:clickable="true"
     android:focusableInTouchMode="true"
     android:orientation="vertical"
+    android:id="@+id/layout_add_edit_contact"
     android:focusable="true">
-<!--    <androidx.appcompat.widget.Toolbar-->
-<!--        android:background="@color/colorPrimary"-->
-<!--        android:id="@+id/toolbar"-->
-<!--        android:layout_width="match_parent"-->
-<!--        android:layout_height="50dp">-->
-<!--        <TextView-->
-<!--            android:id="@+id/txtTitle"-->
-<!--            android:gravity="center"-->
-<!--            android:textSize="30dp"-->
-<!--            android:textColor="#FFFFFF"-->
-<!--            android:text="Thêm người dùng"-->
-<!--            android:layout_width="match_parent"-->
-<!--            android:layout_height="match_parent"/>-->
-<!--    </androidx.appcompat.widget.Toolbar>-->
+
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

@@ -1,3 +1,25 @@
 <resources>
     <string name="app_name">Danh bạ</string>
+    <string name="sync_down">Đồng bộ dữ liệu về máy</string>
+    <string name="sync_up">Đồng bộ dữ liệu lên cloud</string>
+    <string name="detail">Chi tiết</string>
+    <string name="update_success">Cập nhật thành công!</string>
+    <string name="sure_delete">Bạn có chắc chắn xóa người dùng?</string>
+    <string name="yes">Có</string>
+    <string name="delete_success">Xóa thành công</string>
+    <string name="no">Không</string>
+    <string name="update">Cập Nhật</string>
+    <string name="add_success">Thêm dữ liệu thành công</string>
+    <string name="add_contact">Thêm liên lạc</string>
+    <string name="contact">Danh bạ</string>
+    <string name="please_grant_read">Vui lòng cấp quyền đọc bộ nhớ để đồng bộ!</string>
+    <string name="please_grant_write">Vui lòng cấp quyền ghi bộ nhớ để đồng bộ!</string>
+    <string name="sync_success">Đồng bộ thành công!</string>
+    <string name="downloading">Đang thực hiện quá trình tải xuống!</string>
+    <string name="creating_file">Đang tạo file vào bộ nhớ</string>
+    <string name="start_upload">Đã tạo file thành công, bắt đầu quá trình upload!</string>
+    <string name="upload_success">Upload thành công</string>
+    <string name="upload_fail">\"Upload không thành công: \"</string>
+    <string name="start_sync_after_download">Tải xuống thành công! Bắt đầu quá trình đồng bộ</string>
+    <string name="sync_fail">"Lỗi đồng bộ: "</string>
 </resources>

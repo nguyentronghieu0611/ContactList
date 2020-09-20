@@ -1,4 +1,4 @@
-package com.example.contactapp;
+package com.example.contactapp.config;
 
 import com.dropbox.core.DbxRequestConfig;
 import com.dropbox.core.http.OkHttp3Requestor;

@@ -1,13 +1,13 @@
-package com.example.contactapp;
+package com.example.contactapp.view;
 
 import android.Manifest;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
-import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
+import android.os.Handler;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -19,6 +19,7 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.FragmentManager;
@@ -26,17 +27,25 @@ import androidx.fragment.app.FragmentTransaction;
 
 import com.dropbox.core.v2.DbxClientV2;
 import com.dropbox.core.v2.files.FileMetadata;
+import com.example.contactapp.R;
+import com.example.contactapp.adapter.ListContactAdapter;
+import com.example.contactapp.config.DbxRequestConfigFactory;
+import com.example.contactapp.config.Utils;
+import com.example.contactapp.db.ContactDatabase;
+import com.example.contactapp.model.Contact;
+import com.example.contactapp.model.OnChangeContact;
+import com.example.contactapp.task.DownloadFileTask;
+import com.example.contactapp.task.UploadFileTask;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.google.android.material.snackbar.Snackbar;
 import com.google.gson.Gson;
 
 import org.json.JSONArray;
-import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -50,7 +59,6 @@ public class MainActivity extends AppCompatActivity implements OnChangeContact {
     ListView lvContact;
     private final int READ_STORAGE = 146;
     private final int WRITE_STORAGE = 178;
-    //    Toolbar toolbar;
     private int type = 1;
     private ListContactAdapter listContactAdapter;
     private final String SECRET_KEY = "pxtabxb13rwl4al";
@@ -60,6 +68,8 @@ public class MainActivity extends AppCompatActivity implements OnChangeContact {
     private static DbxClientV2 sDbxClient = null;
     private SharedPreferences preferences;
     private SharedPreferences.Editor editor;
+    private Snackbar snackbar;
+    private ConstraintLayout layout;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -92,6 +102,7 @@ public class MainActivity extends AppCompatActivity implements OnChangeContact {
     }
 
     private void initControl() {
+        layout = findViewById(R.id.layout_main);
         lvContact = findViewById(R.id.lvContact);
         btnAdd = findViewById(R.id.btnAddContact);
         db = new ContactDatabase(this);
@@ -131,9 +142,11 @@ public class MainActivity extends AppCompatActivity implements OnChangeContact {
 
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        final ProgressDialog dialog;
         int menuId = item.getItemId();
         if (menuId == R.id.btnSync) {
-            Toast.makeText(this, "Đang tạo file vào bộ nhớ", Toast.LENGTH_SHORT).show();
+            dialog = ProgressDialog.show(MainActivity.this, "",
+                    getString(R.string.creating_file), true);
             String rs = new Gson().toJson(listContact);
             File dirRoot = Environment.getExternalStorageDirectory();
             File fileJson = new File(dirRoot + "/contact.txt");
@@ -151,32 +164,35 @@ public class MainActivity extends AppCompatActivity implements OnChangeContact {
                     e.printStackTrace();
                 }
             }
-            Toast.makeText(this, "Đã tạo file thành công, bắt đầu quá trình upload!", Toast.LENGTH_SHORT).show();
+            dialog.setMessage(getString(R.string.start_upload));
             new UploadFileTask(this, sDbxClient, new UploadFileTask.Callback() {
                 @Override
                 public void onUploadComplete(FileMetadata result) {
-                    Toast.makeText(MainActivity.this, "Upload đám mấy thành công", Toast.LENGTH_SHORT).show();
                     editor.putString("id", result.getId());
                     editor.putString("name", result.getName());
                     editor.putString("rev", result.getRev());
                     editor.putLong("size", result.getSize());
                     editor.putString("pathLower", result.getPathLower());
                     editor.commit();
+                    dialog.dismiss();
+                    Utils.showSnackbar(getString(R.string.upload_success),snackbar,layout);
                 }
 
                 @Override
                 public void onError(Exception e) {
-                    Toast.makeText(MainActivity.this, "Upload không thành công: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                    dialog.dismiss();
+                    Utils.showSnackbar(getString(R.string.upload_fail)+e.getMessage(),snackbar,layout);
                 }
             }).execute(fileJson);
         } else if (menuId == R.id.btnSyncUp){
-            Toast.makeText(this, "Đang thực hiện quá trình tải xuống!", Toast.LENGTH_SHORT).show();
+            dialog = ProgressDialog.show(MainActivity.this, "",
+                    getString(R.string.downloading), true);
             String idFile = preferences.getString("id", null);
             new DownloadFileTask(this, sDbxClient, new DownloadFileTask.Callback() {
                 @Override
                 public void onDownloadComplete(File result) {
                     try {
-                        Toast.makeText(MainActivity.this, "Tải xuống thành công! Bắt đầu quá trình đồng bộ", Toast.LENGTH_SHORT).show();
+                        dialog.setMessage(getString(R.string.start_sync_after_download));
                         FileInputStream inputStream = new FileInputStream(result);
                         StringBuilder stringBuilder = new StringBuilder();
                         byte[] buffer = new byte[1024];
@@ -204,14 +220,19 @@ public class MainActivity extends AppCompatActivity implements OnChangeContact {
                         }
                         listContact = db.getContact();
                         lvContact.setAdapter(new ListContactAdapter(listContact, MainActivity.this));
+                        dialog.dismiss();
+                        Utils.showSnackbar(getString(R.string.sync_success),snackbar,layout);
                     } catch (Exception e) {
-                        Toast.makeText(MainActivity.this, "Lỗi đồng bộ: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                        Utils.showSnackbar(getResources().getString(R.string.sync_fail)+e.getMessage(),snackbar,layout);
+                        dialog.dismiss();
+
                     }
                 }
 
                 @Override
                 public void onError(Exception e) {
-                    Log.e("asdasd", e.getMessage());
+                    Utils.showSnackbar("Lỗi: "+e.getMessage(),snackbar,layout);
+                    dialog.dismiss();
                 }
             }).execute(new FileMetadata(
                     "contact.txt",
@@ -245,7 +266,7 @@ public class MainActivity extends AppCompatActivity implements OnChangeContact {
             type = 1;
             invalidateOptionsMenu();
             btnAdd.show();
-            getSupportActionBar().setTitle("Danh bạ");
+            getSupportActionBar().setTitle(R.string.contact);
         }
         super.onBackPressed();
     }
@@ -254,7 +275,6 @@ public class MainActivity extends AppCompatActivity implements OnChangeContact {
     public void onChange() {
         listContact = db.getContact();
         lvContact.setAdapter(new ListContactAdapter(listContact, this));
-//        listContactAdapter.notifyDataSetChanged();
         onBackPressed();
     }
 
@@ -265,13 +285,13 @@ public class MainActivity extends AppCompatActivity implements OnChangeContact {
 //                Intent intent = new Intent(Intent.ACTION_CALL, Uri.parse("tel:" + contact.phonenummber));
 //                startActivity(intent);
             } else {
-                Toast.makeText(this, "Vui lòng cấp quyền đọc bộ nhớ để đồng bộ!", Toast.LENGTH_SHORT).show();
+                Utils.showSnackbar(getString(R.string.please_grant_read),snackbar,layout);
             }
         } else if (requestCode == WRITE_STORAGE) {
             if ((grantResults.length > 0) && (grantResults[0] == PackageManager.PERMISSION_GRANTED)) {
 //                startActivity(new Intent(Intent.ACTION_VIEW, Uri.fromParts("sms", contact.phonenummber, null)));
             } else {
-                Toast.makeText(this, "Vui lòng cấp quyền ghi bộ nhớ để đồng bộ!", Toast.LENGTH_SHORT).show();
+                Utils.showSnackbar(getString(R.string.please_grant_write),snackbar,layout);
             }
         }
     }

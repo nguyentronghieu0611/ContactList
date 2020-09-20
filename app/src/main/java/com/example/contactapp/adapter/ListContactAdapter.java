@@ -1,4 +1,4 @@
-package com.example.contactapp;
+package com.example.contactapp.adapter;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
@@ -11,6 +11,8 @@ import android.widget.BaseAdapter;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
+import com.example.contactapp.R;
+import com.example.contactapp.model.Contact;
 
 import java.util.List;
 import java.util.Random;

@@ -1,4 +1,4 @@
-package com.example.contactapp;
+package com.example.contactapp.task;
 
 import android.content.ContentUris;
 import android.content.Context;

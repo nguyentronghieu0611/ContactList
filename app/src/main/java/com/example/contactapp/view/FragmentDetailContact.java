@@ -1,4 +1,4 @@
-package com.example.contactapp;
+package com.example.contactapp.view;
 
 import android.Manifest;
 import android.content.Context;
@@ -7,7 +7,6 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.graphics.drawable.BitmapDrawable;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -21,6 +20,7 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -33,7 +33,13 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentTransaction;
+
+import com.example.contactapp.config.Utils;
+import com.example.contactapp.model.Contact;
+import com.example.contactapp.db.ContactDatabase;
+import com.example.contactapp.model.OnChangeContact;
+import com.example.contactapp.R;
+import com.google.android.material.snackbar.Snackbar;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -52,10 +58,12 @@ public class FragmentDetailContact extends Fragment {
     private final int REQUEST_MESSAGE = 110;
     ContactDatabase contactDatabase;
     OnChangeContact changeContact;
-    EditText edtName,edtPhone,edtEmail;
+    EditText edtName, edtPhone, edtEmail;
     Button btnUpdate;
     boolean isUpdate = false;
     CircleImageView imgAvatar;
+    Snackbar snackbar;
+    LinearLayout layout;
 
     public FragmentDetailContact(Contact contact, ContactDatabase contactDatabase) {
         this.contact = contact;
@@ -80,7 +88,8 @@ public class FragmentDetailContact extends Fragment {
     private void initControl(final View view) {
         ActionBar actionBar = ((AppCompatActivity) getActivity()).getSupportActionBar();
         assert actionBar != null;
-        actionBar.setTitle("Chi tiết");
+        actionBar.setTitle(R.string.detail);
+        layout = view.findViewById(R.id.layout_detail_contact);
         imgAvatar = view.findViewById(R.id.imgAvatar);
         btnUpdate = view.findViewById(R.id.btnUpdate);
         imgMessage = view.findViewById(R.id.imgMessage);
@@ -95,9 +104,8 @@ public class FragmentDetailContact extends Fragment {
             imgAvatar.setImageBitmap(bitmap);
             imgAvatar.setVisibility(View.VISIBLE);
             txtIcon.setVisibility(View.GONE);
-        }
-        else {
-            txtIcon.setText(contact.name.substring(0,1).toUpperCase());
+        } else {
+            txtIcon.setText(contact.name.substring(0, 1).toUpperCase());
             imgAvatar.setVisibility(View.GONE);
             txtIcon.setVisibility(View.VISIBLE);
         }
@@ -170,22 +178,30 @@ public class FragmentDetailContact extends Fragment {
                     edtEmail.setEnabled(true);
                     btnUpdate.setText("Hoàn Thành");
                     isUpdate = true;
-                }
-                else{
+                } else {
                     edtName.setEnabled(false);
                     edtPhone.setEnabled(false);
                     edtEmail.setEnabled(false);
-                    btnUpdate.setText("Cập Nhật");
-                    contact.name = edtName.getText().toString();
-                    contact.phonenummber = edtPhone.getText().toString();
-                    contact.email = edtEmail.getText().toString();
-                    contact.image = image;
-                    int rs = contactDatabase.updateContact(contact);
-                    if(rs>0){
-                        changeContact.onChange();
-                        Toast.makeText(getContext(),"Cập nhật thành công",Toast.LENGTH_SHORT).show();
+                    btnUpdate.setText(R.string.update);
+                    if (!Utils.isValidName(edtName.getText().toString()))
+                        Utils.showSnackbar("Tên không hợp lệ", snackbar, layout);
+                    else if (!Utils.isValidPhoneNumber(edtPhone.getText().toString()))
+                        Utils.showSnackbar("Số điện thoại không hợp lệ", snackbar, layout);
+                    else if (!Utils.isValidEmail(edtEmail.getText().toString()))
+                        Utils.showSnackbar("Email không hợp lệ", snackbar, layout);
+                    else {
+                        contact.name = edtName.getText().toString();
+                        contact.phonenummber = edtPhone.getText().toString();
+                        contact.email = edtEmail.getText().toString();
+                        contact.image = image;
+                        int rs = contactDatabase.updateContact(contact);
+                        if (rs > 0) {
+                            changeContact.onChange();
+                            Utils.showSnackbar(getString(R.string.update_success), snackbar, layout);
+//                        Toast.makeText(getContext(),"Cập nhật thành công",Toast.LENGTH_SHORT).show();
+                        }
+                        isUpdate = false;
                     }
-                    isUpdate = false;
                 }
             }
         });
@@ -213,18 +229,19 @@ public class FragmentDetailContact extends Fragment {
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         new AlertDialog.Builder(getContext())
                 .setIcon(android.R.drawable.ic_dialog_alert)
-                .setMessage("Bạn có chắc chắn xóa người dùng?")
-                .setPositiveButton("Có", new DialogInterface.OnClickListener() {
+                .setMessage(R.string.sure_delete)
+                .setPositiveButton(R.string.yes, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         int i = contactDatabase.deleteContact(contact);
                         if (i > 0) {
-                            Toast.makeText(getContext(), "Xóa thành công", Toast.LENGTH_SHORT).show();
+//                            Toast.makeText(getContext(), R.string.delete_success, Toast.LENGTH_SHORT).show();
+                            Utils.showSnackbar(getString(R.string.delete_success),snackbar,layout);
                             changeContact.onChange();
                         }
                     }
                 })
-                .setNegativeButton("Không", null)
+                .setNegativeButton(R.string.no, null)
                 .show();
 
         return super.onOptionsItemSelected(item);

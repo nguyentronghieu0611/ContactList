@@ -5,6 +5,7 @@
     android:layout_height="match_parent"
     android:orientation="vertical"
     android:clickable="true"
+    android:id="@+id/layout_detail_contact"
     android:background="#303030"
     android:focusable="true">
 <!--    <androidx.appcompat.widget.Toolbar-->

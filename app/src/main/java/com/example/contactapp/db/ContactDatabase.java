@@ -1,4 +1,4 @@
-package com.example.contactapp;
+package com.example.contactapp.db;
 
 import android.content.ContentValues;
 import android.content.Context;
@@ -6,7 +6,8 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
-import java.sql.Blob;
+import com.example.contactapp.model.Contact;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -44,16 +45,6 @@ public class ContactDatabase extends SQLiteOpenHelper {
         values.put("image", contact.image);
         return sqLiteDatabase.insert("tblContact", null, values);
     }
-
-//    public Cursor updateContact(Contact contact){
-//        SQLiteDatabase sqLiteDatabase = getWritableDatabase();
-//        ContentValues values = new ContentValues();
-//        values.put("phonenumber", contact.phonenummber);
-//        values.put("name", contact.name);
-//        values.put("email", contact.email);
-//        values.put("image", contact.image);
-//        return sqLiteDatabase.rawQuery("update tblContact set phonenumber = ?,name = ?, email = ?, image = ? where id = ?", new String[]{contact.phonenummber,contact.name,contact.email,contact.image.toString(),contact.id.toString()});
-//    }
 
     public int updateContact(Contact contact){
         SQLiteDatabase sqLiteDatabase = getWritableDatabase();

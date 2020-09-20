@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
     <item android:id="@+id/btnSyncUp"
-        android:title="Cập nhật dữ liệu lên cloud" />
+        android:title="@string/sync_down" />
     <item android:id="@+id/btnSync"
-        android:title="Đồng bộ dữ liệu với cloud" />
+        android:title="@string/sync_up" />
 </menu>

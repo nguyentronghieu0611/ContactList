@@ -1,4 +1,4 @@
-package com.example.contactapp;
+package com.example.contactapp.model;
 
 public interface OnChangeContact {
     void onChange();

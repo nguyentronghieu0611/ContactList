@@ -1,4 +1,4 @@
-package com.example.contactapp;
+package com.example.contactapp.task;
 
 import android.content.Context;
 import android.net.Uri;
@@ -21,7 +21,7 @@ import java.io.InputStream;
 /**
  * Async task to upload a file to a directory
  */
-class UploadFileTask extends AsyncTask<File, Void, FileMetadata> {
+public class UploadFileTask extends AsyncTask<File, Void, FileMetadata> {
 
     private final Context mContext;
     private final DbxClientV2 mDbxClient;
@@ -34,7 +34,7 @@ class UploadFileTask extends AsyncTask<File, Void, FileMetadata> {
         void onError(Exception e);
     }
 
-    UploadFileTask(Context context, DbxClientV2 dbxClient, Callback callback) {
+    public UploadFileTask(Context context, DbxClientV2 dbxClient, Callback callback) {
         mContext = context;
         mDbxClient = dbxClient;
         mCallback = callback;

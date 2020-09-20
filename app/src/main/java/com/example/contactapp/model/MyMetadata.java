@@ -1,4 +1,4 @@
-package com.example.contactapp;
+package com.example.contactapp.model;
 
 import com.dropbox.core.v2.files.FileMetadata;
 

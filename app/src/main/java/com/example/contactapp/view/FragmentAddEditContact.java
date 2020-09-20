@@ -1,10 +1,8 @@
-package com.example.contactapp;
+package com.example.contactapp.view;
 
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.graphics.drawable.BitmapDrawable;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -17,20 +15,23 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
-import android.widget.Toolbar;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.cardview.widget.CardView;
 import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentTransaction;
 
-import com.bumptech.glide.Glide;
+import com.example.contactapp.config.Utils;
+import com.example.contactapp.model.Contact;
+import com.example.contactapp.db.ContactDatabase;
+import com.example.contactapp.model.OnChangeContact;
+import com.example.contactapp.R;
+import com.google.android.material.snackbar.Snackbar;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -47,6 +48,8 @@ public class FragmentAddEditContact extends Fragment {
     OnChangeContact changeContact;
     TextView txtIcon;
     Button btnUpdate;
+    LinearLayout layout;
+    Snackbar snackbar;
 
     public FragmentAddEditContact(ContactDatabase contactDatabase) {
         this.contactDatabase = contactDatabase;
@@ -70,13 +73,14 @@ public class FragmentAddEditContact extends Fragment {
     private void initControl(final View view) {
         ActionBar actionBar = ((AppCompatActivity) getActivity()).getSupportActionBar();
         assert actionBar != null;
+        layout = view.findViewById(R.id.layout_add_edit_contact);
         btnUpdate = view.findViewById(R.id.btnUpdate);
         txtIcon = view.findViewById(R.id.txtIcon);
         imgAvatar = view.findViewById(R.id.imgAvatar);
         edtName = view.findViewById(R.id.edtName);
         edtPhone = view.findViewById(R.id.edtPhone);
         edtEmail = view.findViewById(R.id.edtEmail);
-        actionBar.setTitle("Thêm liên lạc");
+        actionBar.setTitle(R.string.add_contact);
 
     }
 
@@ -106,16 +110,25 @@ public class FragmentAddEditContact extends Fragment {
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         int menuID = item.getItemId();
         if (menuID == R.id.btnAddDone) {
-            final Contact contact = new Contact(
-                    edtName.getText().toString(),
-                    edtPhone.getText().toString(),
-                    edtEmail.getText().toString(),
-                    image
-            );
-            if (contactDatabase.insertContact(contact) > 0) {
-                Toast.makeText(getActivity(), "Thêm dữ liệu thành công", Toast.LENGTH_SHORT).show();
-                changeContact.onChange();
+            if (!Utils.isValidName(edtName.getText().toString()))
+                Utils.showSnackbar("Tên không hợp lệ", snackbar, layout);
+            else if (!Utils.isValidPhoneNumber(edtPhone.getText().toString()))
+                Utils.showSnackbar("Số điện thoại không hợp lệ", snackbar, layout);
+            else if (!Utils.isValidEmail(edtEmail.getText().toString()))
+                Utils.showSnackbar("Email không hợp lệ", snackbar, layout);
+            else {
+                final Contact contact = new Contact(
+                        edtName.getText().toString(),
+                        edtPhone.getText().toString(),
+                        edtEmail.getText().toString(),
+                        image
+                );
+                if (contactDatabase.insertContact(contact) > 0) {
+                    Utils.showSnackbar(getString(R.string.add_success), snackbar, layout);
+                    changeContact.onChange();
+                }
             }
+
         }
         return super.onOptionsItemSelected(item);
     }
@@ -129,7 +142,7 @@ public class FragmentAddEditContact extends Fragment {
             Uri imageUri = data.getData();
             try {
                 final Bitmap bitmapSelection = MediaStore.Images.Media.getBitmap(Objects.requireNonNull(getActivity()).getContentResolver(), imageUri);
-                final Bitmap bitmapScale = Bitmap.createScaledBitmap(bitmapSelection,150, bitmapSelection.getHeight() * 150 / bitmapSelection.getWidth() ,false);
+                final Bitmap bitmapScale = Bitmap.createScaledBitmap(bitmapSelection, 150, bitmapSelection.getHeight() * 150 / bitmapSelection.getWidth(), false);
                 ByteArrayOutputStream stream = new ByteArrayOutputStream();
                 bitmapScale.compress(Bitmap.CompressFormat.PNG, 100, stream);
                 image = stream.toByteArray();
