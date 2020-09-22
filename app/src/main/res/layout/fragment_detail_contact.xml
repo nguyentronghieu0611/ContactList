@@ -1,162 +1,155 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
     android:clickable="true"
     android:id="@+id/layout_detail_contact"
     android:background="#303030"
     android:focusable="true">
-<!--    <androidx.appcompat.widget.Toolbar-->
-<!--        android:id="@+id/toolbar"-->
-<!--        android:background="@color/colorPrimary"-->
-<!--        android:layout_width="match_parent"-->
-<!--        android:layout_height="50dp">-->
-<!--        <TextView-->
-<!--            android:gravity="center"-->
-<!--            android:textSize="30dp"-->
-<!--            android:textColor="#FFFFFF"-->
-<!--            android:text="Thông tin"-->
-<!--            android:layout_width="match_parent"-->
-<!--            android:layout_height="match_parent"/>-->
-<!--    </androidx.appcompat.widget.Toolbar>-->
+
     <LinearLayout
-        android:layout_margin="7dp"
         android:layout_width="match_parent"
-        android:layout_height="120sp"
-        android:orientation="horizontal"
-        app:layout_constraintTop_toTopOf="parent">
-
-
-        <FrameLayout
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+        <LinearLayout
             android:layout_margin="7dp"
-            app:layout_constraintLeft_toLeftOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            android:id="@+id/layoutLeft"
-            android:layout_width="wrap_content"
-            android:layout_height="100dp">
+            android:layout_width="match_parent"
+            android:layout_height="120sp"
+            android:orientation="horizontal"
+            app:layout_constraintTop_toTopOf="parent">
 
-            <TextView
-                android:id="@+id/txtIcon"
-                android:layout_width="100dp"
-                android:layout_height="100dp"
-                android:background="@drawable/circle"
-                android:gravity="center"
-                android:text="H"
+
+            <FrameLayout
+                android:layout_margin="7dp"
+                app:layout_constraintLeft_toLeftOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                android:id="@+id/layoutLeft"
+                android:layout_width="wrap_content"
+                android:layout_height="100dp">
+
+                <TextView
+                    android:id="@+id/txtIcon"
+                    android:layout_width="100dp"
+                    android:layout_height="100dp"
+                    android:background="@drawable/circle"
+                    android:gravity="center"
+                    android:text="H"
+                    android:textColor="#FFFFFF"
+                    android:textSize="40dp"
+                    android:visibility="gone"
+                    android:textStyle="bold" />
+
+
+                <de.hdodenhof.circleimageview.CircleImageView
+                    app:civ_circle_background_color="#E83636"
+                    android:id="@+id/imgAvatar"
+                    android:layout_width="100dp"
+                    android:visibility="gone"
+                    android:layout_height="100dp"
+                    android:src="@drawable/ic_user"
+                    android:scaleType="centerCrop"/>
+            </FrameLayout>
+
+
+
+            <ImageView
+                android:layout_gravity="center_vertical"
+                android:id="@+id/imgPhone"
+                android:layout_width="50dp"
+                android:layout_height="50dp"
+                android:layout_marginLeft="7dp"
+                android:background="@drawable/ic_phone" />
+
+            <ImageView
+                android:layout_gravity="center_vertical"
+                android:id="@+id/imgMessage"
+                android:layout_width="50dp"
+                android:layout_height="50dp"
+                android:layout_marginLeft="7dp"
+                android:background="@drawable/ic_message" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_marginTop="50dp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:orientation="horizontal"
+            android:padding="10dp">
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/ic_user" />
+            <EditText
+                android:enabled="false"
+                android:id="@+id/txtName"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="Họ và tên"
+                android:paddingLeft="10dp"
                 android:textColor="#FFFFFF"
-                android:textSize="40dp"
-                android:visibility="gone"
-                android:textStyle="bold" />
+                android:textColorHint="#A8FFFFFF" />
 
 
-            <de.hdodenhof.circleimageview.CircleImageView
-                app:civ_circle_background_color="#E83636"
-                android:id="@+id/imgAvatar"
-                android:layout_width="100dp"
-                android:visibility="gone"
-                android:layout_height="100dp"
-                android:src="@drawable/ic_user"
-                android:scaleType="centerCrop"/>
-        </FrameLayout>
+        </LinearLayout>
 
-
-
-        <ImageView
-            android:layout_gravity="center_vertical"
-            android:id="@+id/imgPhone"
-            android:layout_width="50dp"
-            android:layout_height="50dp"
-            android:layout_marginLeft="7dp"
-            android:background="@drawable/ic_phone" />
-
-        <ImageView
-            android:layout_gravity="center_vertical"
-            android:id="@+id/imgMessage"
-            android:layout_width="50dp"
-            android:layout_height="50dp"
-            android:layout_marginLeft="7dp"
-            android:background="@drawable/ic_message" />
-
-    </LinearLayout>
-
-    <LinearLayout
-        android:layout_marginTop="50dp"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:gravity="center"
-        android:orientation="horizontal"
-        android:padding="10dp">
-        <ImageView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:src="@drawable/ic_user" />
-        <EditText
-            android:enabled="false"
-            android:id="@+id/txtName"
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="Họ và tên"
-            android:paddingLeft="10dp"
-            android:textColor="#FFFFFF"
-            android:textColorHint="#A8FFFFFF" />
+            android:gravity="center"
+            android:orientation="horizontal"
+            android:padding="10dp">
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/ic_phone" />
+            <EditText
+                android:id="@+id/txtPhone"
+                android:enabled="false"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="Số điện thoại"
+                android:inputType="number"
+                android:paddingLeft="10dp"
+                android:textColor="#FFFFFF"
+                android:textColorHint="#A8FFFFFF" />
 
 
-    </LinearLayout>
+        </LinearLayout>
 
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:gravity="center"
-        android:orientation="horizontal"
-        android:padding="10dp">
-        <ImageView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:src="@drawable/ic_phone" />
-        <EditText
-            android:id="@+id/txtPhone"
-            android:enabled="false"
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="Số điện thoại"
-            android:inputType="number"
-            android:paddingLeft="10dp"
+            android:gravity="center"
+            android:orientation="horizontal"
+            android:padding="10dp">
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/ic_mail" />
+            <EditText
+                android:enabled="false"
+                android:id="@+id/txtEmail"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="Email"
+                android:paddingLeft="10dp"
+                android:textColor="#FFFFFF"
+                android:textColorHint="#A8FFFFFF" />
+
+
+        </LinearLayout>
+
+        <Button
+            android:background="@drawable/background_radius"
+            android:layout_marginHorizontal="50dp"
+            android:id="@+id/btnUpdate"
             android:textColor="#FFFFFF"
-            android:textColorHint="#A8FFFFFF" />
-
-
-    </LinearLayout>
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:gravity="center"
-        android:orientation="horizontal"
-        android:padding="10dp">
-        <ImageView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:src="@drawable/ic_mail" />
-        <EditText
-            android:enabled="false"
-            android:id="@+id/txtEmail"
+            android:text="Cập nhật"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:hint="Email"
-            android:paddingLeft="10dp"
-            android:textColor="#FFFFFF"
-            android:textColorHint="#A8FFFFFF" />
-
-
+            android:layout_height="wrap_content"/>
     </LinearLayout>
 
-    <Button
-        android:background="@drawable/background_radius"
-        android:layout_marginHorizontal="50dp"
-        android:id="@+id/btnUpdate"
-        android:textColor="#FFFFFF"
-        android:text="Cập nhật"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"/>
-</LinearLayout>
+</ScrollView>

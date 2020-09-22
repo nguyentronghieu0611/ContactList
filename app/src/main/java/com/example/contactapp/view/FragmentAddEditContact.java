@@ -16,6 +16,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -48,7 +49,7 @@ public class FragmentAddEditContact extends Fragment {
     OnChangeContact changeContact;
     TextView txtIcon;
     Button btnUpdate;
-    LinearLayout layout;
+    ScrollView layout;
     Snackbar snackbar;
 
     public FragmentAddEditContact(ContactDatabase contactDatabase) {

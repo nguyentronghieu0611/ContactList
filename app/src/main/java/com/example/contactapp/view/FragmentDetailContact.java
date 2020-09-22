@@ -21,6 +21,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -63,7 +64,7 @@ public class FragmentDetailContact extends Fragment {
     boolean isUpdate = false;
     CircleImageView imgAvatar;
     Snackbar snackbar;
-    LinearLayout layout;
+    ScrollView layout;
 
     public FragmentDetailContact(Contact contact, ContactDatabase contactDatabase) {
         this.contact = contact;
