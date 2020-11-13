@@ -22,4 +22,6 @@
     <string name="upload_fail">\"Upload không thành công: \"</string>
     <string name="start_sync_after_download">Tải xuống thành công! Bắt đầu quá trình đồng bộ</string>
     <string name="sync_fail">"Lỗi đồng bộ: "</string>
+    <string name="file_not_found">Không tìm thấy file</string>
+    <string name="hintSearchMess">Tìm kiếm...</string>
 </resources>

@@ -49,18 +49,15 @@ public class ListContactAdapter extends BaseAdapter {
     @Override
     public View getView(int i, View convertView, ViewGroup viewGroup) {
         ViewHolder holder;
-        Random r = new Random();
         GradientDrawable draw = new GradientDrawable();
         draw.setShape(GradientDrawable.OVAL);
-        int i1 = r.nextInt(9);
         if (convertView == null) {
             convertView = layoutInflater.inflate(R.layout.layout_items_contact, null);
             holder = new ViewHolder();
-            holder.color = Color.parseColor(colors[i1]);
             holder.txtIcon = (TextView) convertView.findViewById(R.id.txtIcon);
             holder.txtContactName = (TextView) convertView.findViewById(R.id.txtContactName);
             holder.imageView = convertView.findViewById(R.id.imgAvatar);
-            draw.setColor(holder.color);
+            draw.setColor(context.getResources().getColor(R.color.colorAccent));
             holder.txtIcon.setBackground(draw);
             convertView.setTag(holder);
         } else {
@@ -84,7 +81,6 @@ public class ListContactAdapter extends BaseAdapter {
 
 
     static class ViewHolder{
-        int color;
         TextView txtIcon, txtContactName;
         CircleImageView imageView;
     }

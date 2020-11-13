@@ -2,12 +2,16 @@ package com.example.contactapp.view;
 
 import android.Manifest;
 import android.app.ProgressDialog;
+import android.app.SearchManager;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
+import android.os.DropBoxManager;
 import android.os.Environment;
 import android.os.Handler;
+import android.os.Message;
+import android.text.Html;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -19,14 +23,18 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.SearchView;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 
+import com.dropbox.core.DbxException;
 import com.dropbox.core.v2.DbxClientV2;
 import com.dropbox.core.v2.files.FileMetadata;
+import com.dropbox.core.v2.files.ListFolderResult;
+import com.dropbox.core.v2.files.Metadata;
 import com.example.contactapp.R;
 import com.example.contactapp.adapter.ListContactAdapter;
 import com.example.contactapp.config.DbxRequestConfigFactory;
@@ -35,12 +43,14 @@ import com.example.contactapp.db.ContactDatabase;
 import com.example.contactapp.model.Contact;
 import com.example.contactapp.model.OnChangeContact;
 import com.example.contactapp.task.DownloadFileTask;
+import com.example.contactapp.task.GetFileIdTask;
 import com.example.contactapp.task.UploadFileTask;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.gson.Gson;
 
 import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.ByteArrayOutputStream;
@@ -70,6 +80,7 @@ public class MainActivity extends AppCompatActivity implements OnChangeContact {
     private SharedPreferences.Editor editor;
     private Snackbar snackbar;
     private ConstraintLayout layout;
+    SearchView searchView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -187,62 +198,83 @@ public class MainActivity extends AppCompatActivity implements OnChangeContact {
         } else if (menuId == R.id.btnSyncUp){
             dialog = ProgressDialog.show(MainActivity.this, "",
                     getString(R.string.downloading), true);
-            String idFile = preferences.getString("id", null);
-            new DownloadFileTask(this, sDbxClient, new DownloadFileTask.Callback() {
-                @Override
-                public void onDownloadComplete(File result) {
-                    try {
-                        dialog.setMessage(getString(R.string.start_sync_after_download));
-                        FileInputStream inputStream = new FileInputStream(result);
-                        StringBuilder stringBuilder = new StringBuilder();
-                        byte[] buffer = new byte[1024];
-                        int n;
-                        while ((n = inputStream.read(buffer)) != -1) {
-                            stringBuilder.append(new String(buffer, 0, n));
-                        }
-                        JSONArray jsonArray = new JSONArray(stringBuilder.toString());
-                        db.deleteAll();
-                        for (int i = 0; i < jsonArray.length(); i++) {
-                            JSONObject objTemp = jsonArray.getJSONObject(i);
-                            ByteArrayOutputStream output = null;
-                            if (objTemp.has("image")) {
-                                JSONArray arrTemp = objTemp.getJSONArray("image");
-                                output = new ByteArrayOutputStream();
-                                for (int j = 0; j < arrTemp.length(); j++) {
-                                    output.write(arrTemp.getInt(j));
-                                }
-                            }
-                            db.insertContact(
-                                    new Contact(objTemp.getString("name"),
-                                            objTemp.getString("phonenummber"),
-                                            objTemp.getString("email"),
-                                            output == null ? null : output.toByteArray()));
-                        }
-                        listContact = db.getContact();
-                        lvContact.setAdapter(new ListContactAdapter(listContact, MainActivity.this));
-                        dialog.dismiss();
-                        Utils.showSnackbar(getString(R.string.sync_success),snackbar,layout);
-                    } catch (Exception e) {
-                        Utils.showSnackbar(getResources().getString(R.string.sync_fail)+e.getMessage(),snackbar,layout);
-                        dialog.dismiss();
 
+            new GetFileIdTask(this, sDbxClient, new GetFileIdTask.Callback() {
+                @Override
+                public void onGetIdComplete(JSONObject result) {
+                    if(result!=null){
+                        try {
+                            new DownloadFileTask(MainActivity.this, sDbxClient, new DownloadFileTask.Callback() {
+                                @Override
+                                public void onDownloadComplete(File result) {
+                                    try {
+                                        dialog.setMessage(getString(R.string.start_sync_after_download));
+                                        FileInputStream inputStream = new FileInputStream(result);
+                                        StringBuilder stringBuilder = new StringBuilder();
+                                        byte[] buffer = new byte[1024];
+                                        int n;
+                                        while ((n = inputStream.read(buffer)) != -1) {
+                                            stringBuilder.append(new String(buffer, 0, n));
+                                        }
+                                        JSONArray jsonArray = new JSONArray(stringBuilder.toString());
+                                        db.deleteAll();
+                                        for (int i = 0; i < jsonArray.length(); i++) {
+                                            JSONObject objTemp = jsonArray.getJSONObject(i);
+                                            ByteArrayOutputStream output = null;
+                                            if (objTemp.has("image")) {
+                                                JSONArray arrTemp = objTemp.getJSONArray("image");
+                                                output = new ByteArrayOutputStream();
+                                                for (int j = 0; j < arrTemp.length(); j++) {
+                                                    output.write(arrTemp.getInt(j));
+                                                }
+                                            }
+                                            db.insertContact(
+                                                    new Contact(objTemp.getString("name"),
+                                                            objTemp.getString("phonenummber"),
+                                                            objTemp.getString("email"),
+                                                            output == null ? null : output.toByteArray()));
+                                        }
+                                        listContact = db.getContact();
+                                        lvContact.setAdapter(new ListContactAdapter(listContact, MainActivity.this));
+                                        dialog.dismiss();
+                                        Utils.showSnackbar(getString(R.string.sync_success),snackbar,layout);
+                                    } catch (Exception e) {
+                                        Utils.showSnackbar(getResources().getString(R.string.sync_fail)+e.getMessage(),snackbar,layout);
+                                        dialog.dismiss();
+                                    }
+                                }
+
+                                @Override
+                                public void onError(Exception e) {
+                                    Utils.showSnackbar("Lỗi: "+e.getMessage(),snackbar,layout);
+                                    dialog.dismiss();
+                                }
+                            }).execute(new FileMetadata(
+                                    "contact.txt",
+                                    result.getString("id"),
+                                    new Date(),
+                                    new Date(),
+                                    result.getString("rev"),
+                                    result.getInt("size"))
+                            );
+                        } catch (JSONException e) {
+                            dialog.dismiss();
+                            Utils.showSnackbar(getString(R.string.file_not_found),snackbar,layout);
+                        }
                     }
+                    else {
+                        dialog.dismiss();
+                        Utils.showSnackbar(getString(R.string.file_not_found),snackbar,layout);
+                    }
+
                 }
 
                 @Override
                 public void onError(Exception e) {
-                    Utils.showSnackbar("Lỗi: "+e.getMessage(),snackbar,layout);
                     dialog.dismiss();
+                    Utils.showSnackbar(getResources().getString(R.string.sync_fail)+e.getMessage(),snackbar,layout);
                 }
-            }).execute(new FileMetadata(
-                    "contact.txt",
-                    idFile,
-                    new Date(),
-                    new Date(),
-                    preferences.getString("rev", null),
-                    preferences.getLong("size", 0))
-            );
-
+            }).execute(new Object());
         }
         return super.onOptionsItemSelected(item);
     }
@@ -252,6 +284,7 @@ public class MainActivity extends AppCompatActivity implements OnChangeContact {
         MenuInflater menuInflater = getMenuInflater();
         if (type == 1) {
             menuInflater.inflate(R.menu.menu, menu);
+            initSearch(menu);
         } else if (type == 2) {
             menuInflater.inflate(R.menu.menu_done, menu);
         } else {
@@ -294,6 +327,71 @@ public class MainActivity extends AppCompatActivity implements OnChangeContact {
                 Utils.showSnackbar(getString(R.string.please_grant_write),snackbar,layout);
             }
         }
+    }
+
+    private void initSearch(Menu menu){
+        MenuItem searchItem = menu.findItem(R.id.action_search);
+        searchView =
+                (SearchView) searchItem.getActionView();
+        searchView.setQueryHint(Html.fromHtml("<font color = #AEAEAE>" + getResources().getString(R.string.hintSearchMess) + "</font>"));
+        SearchManager searchManager =
+                (SearchManager) getSystemService(Context.SEARCH_SERVICE);
+        searchView.setSearchableInfo(
+                searchManager.getSearchableInfo(getComponentName()));
+        searchView.setOnSearchClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Log.d("TAG","CLICKED SEARCH");
+            }
+        });
+
+        searchItem.setOnActionExpandListener(new MenuItem.OnActionExpandListener() {
+            @Override
+            public boolean onMenuItemActionExpand(MenuItem item) {
+                return true;
+            }
+
+            @Override
+            public boolean onMenuItemActionCollapse(MenuItem item) {
+                Log.d("TAG","CLICKED CLOSE SEARCH");
+                listContact = db.getContact();
+                lvContact.setAdapter(new ListContactAdapter(listContact, MainActivity.this));
+                return true;
+            }
+        });
+        searchView.setOnCloseListener(new SearchView.OnCloseListener() {
+            @Override
+            public boolean onClose() {
+                return false;
+            }
+        });
+        searchView.setSubmitButtonEnabled(true);
+        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String query) {
+                Log.d("query",query);
+                listContact = db.searchContact(query.toUpperCase());
+                lvContact.setAdapter(new ListContactAdapter(listContact, MainActivity.this));
+                return true;
+            }
+
+            @Override
+            public boolean onQueryTextChange(final String newText) {
+//                if(!newText.isEmpty())
+//                    initStateSearch(true);
+//                new Handler().postDelayed(new Runnable() {
+//                    @Override
+//                    public void run() {
+//                        Log.d("newText",newText);
+//                        listError = db.searchError(newText.toUpperCase());
+//                        lvError.setAdapter(new ErrorAdapter(listError,ErrorActivity.this,fragmentManager,db));
+//                        db.insertHistory(new SearchHistory(user_id,newText));
+//                    }
+//                },1500);
+
+                return true;
+            }
+        });
     }
 
 }

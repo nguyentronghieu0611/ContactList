@@ -90,6 +90,25 @@ public class ContactDatabase extends SQLiteOpenHelper {
         return result;
     }
 
+    public List<Contact> searchContact(String input){
+        SQLiteDatabase sqLiteDatabase = getReadableDatabase();
+        Cursor c = sqLiteDatabase.rawQuery("Select * from tblContact where upper(name) like '%"+input+"%'", null);
+        List<Contact> result = new ArrayList<>();
+        Contact contact;
+        if(c.moveToFirst()){
+            do{
+                int id = c.getInt(0);
+                String phonenumber = c.getString(1);
+                String name = c.getString(2);
+                String email = c.getString(3);
+                byte[] image = c.getBlob(4);
+                contact = new Contact(id,name,phonenumber,email,image);
+                result.add(contact);
+            }while (c.moveToNext());
+        }
+        return result;
+    }
+
     public Contact getContactDetail(String idInput){
         SQLiteDatabase sqLiteDatabase = getReadableDatabase();
         Cursor c = sqLiteDatabase.rawQuery("Select * from tblContact where id = ?", new String[]{idInput});
