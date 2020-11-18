@@ -1,6 +1,7 @@
 package com.example.contactapp.view;
 
 import android.Manifest;
+import android.app.Activity;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -20,10 +21,8 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.ScrollView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -116,6 +115,33 @@ public class FragmentDetailContact extends Fragment {
     }
 
     private void bindEvent() {
+        edtEmail.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+            @Override
+            public void onFocusChange(View v, boolean hasFocus) {
+                if (!hasFocus) {
+                    hideKeyboard(v);
+                }
+            }
+        });
+
+        edtName.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+            @Override
+            public void onFocusChange(View v, boolean hasFocus) {
+                if (!hasFocus) {
+                    hideKeyboard(v);
+                }
+            }
+        });
+
+        edtPhone.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+            @Override
+            public void onFocusChange(View v, boolean hasFocus) {
+                if (!hasFocus) {
+                    hideKeyboard(v);
+                }
+            }
+        });
+
         imgPhone.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -170,42 +196,46 @@ public class FragmentDetailContact extends Fragment {
         btnUpdate.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (!isUpdate) {
-                    edtName.requestFocus();
-                    InputMethodManager imm = (InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
-                    imm.showSoftInput(edtName, InputMethodManager.SHOW_IMPLICIT);
-                    edtName.setEnabled(true);
-                    edtPhone.setEnabled(true);
-                    edtEmail.setEnabled(true);
-                    btnUpdate.setText("Hoàn Thành");
-                    isUpdate = true;
-                } else {
-                    edtName.setEnabled(false);
-                    edtPhone.setEnabled(false);
-                    edtEmail.setEnabled(false);
-                    btnUpdate.setText(R.string.update);
-                    if (!Utils.isValidName(edtName.getText().toString()))
-                        Utils.showSnackbar("Tên không hợp lệ", snackbar, layout);
-                    else if (!Utils.isValidPhoneNumber(edtPhone.getText().toString()))
-                        Utils.showSnackbar("Số điện thoại không hợp lệ", snackbar, layout);
-                    else if (!Utils.isValidEmail(edtEmail.getText().toString()))
-                        Utils.showSnackbar("Email không hợp lệ", snackbar, layout);
-                    else {
-                        contact.name = edtName.getText().toString();
-                        contact.phonenummber = edtPhone.getText().toString();
-                        contact.email = edtEmail.getText().toString();
-                        contact.image = image;
-                        int rs = contactDatabase.updateContact(contact);
-                        if (rs > 0) {
-                            changeContact.onChange();
-                            Utils.showSnackbar(getString(R.string.update_success), snackbar, layout);
-//                        Toast.makeText(getContext(),"Cập nhật thành công",Toast.LENGTH_SHORT).show();
-                        }
-                        isUpdate = false;
-                    }
-                }
+                doSave();
             }
         });
+    }
+
+    private void doSave(){
+        if (!isUpdate) {
+//            edtName.requestFocus();
+            InputMethodManager imm = (InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
+            imm.showSoftInput(edtName, InputMethodManager.SHOW_IMPLICIT);
+            edtName.setEnabled(true);
+            edtPhone.setEnabled(true);
+            edtEmail.setEnabled(true);
+            btnUpdate.setText("Hoàn Thành");
+            isUpdate = true;
+        } else {
+            edtName.setEnabled(false);
+            edtPhone.setEnabled(false);
+            edtEmail.setEnabled(false);
+            btnUpdate.setText(R.string.update);
+            if (!Utils.isValidName(edtName.getText().toString()))
+                Utils.showSnackbar("Tên không hợp lệ", snackbar, layout);
+            else if (!Utils.isValidPhoneNumber(edtPhone.getText().toString()))
+                Utils.showSnackbar("Số điện thoại không hợp lệ", snackbar, layout);
+            else if (!Utils.isValidEmail(edtEmail.getText().toString()))
+                Utils.showSnackbar("Email không hợp lệ", snackbar, layout);
+            else {
+                contact.name = edtName.getText().toString();
+                contact.phonenummber = edtPhone.getText().toString();
+                contact.email = edtEmail.getText().toString();
+                contact.image = image;
+                int rs = contactDatabase.updateContact(contact);
+                if (rs > 0) {
+                    changeContact.onChange();
+                    Utils.showSnackbar(getString(R.string.update_success), snackbar, layout);
+//                        Toast.makeText(getContext(),"Cập nhật thành công",Toast.LENGTH_SHORT).show();
+                }
+                isUpdate = false;
+            }
+        }
     }
 
     @Override
@@ -268,10 +298,17 @@ public class FragmentDetailContact extends Fragment {
                 bitmapSelection.compress(Bitmap.CompressFormat.PNG, 30, stream);
                 image = stream.toByteArray();
                 imgAvatar.setImageBitmap(bitmapSelection);
+                imgAvatar.setVisibility(View.VISIBLE);
                 txtIcon.setVisibility(View.GONE);
+                doSave();
             } catch (IOException e) {
                 e.printStackTrace();
             }
         }
+    }
+
+    private void hideKeyboard(View view) {
+        InputMethodManager inputMethodManager =(InputMethodManager)getActivity().getSystemService(Activity.INPUT_METHOD_SERVICE);
+        inputMethodManager.hideSoftInputFromWindow(view.getWindowToken(), 0);
     }
 }

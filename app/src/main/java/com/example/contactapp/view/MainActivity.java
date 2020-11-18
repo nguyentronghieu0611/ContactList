@@ -4,6 +4,7 @@ import android.Manifest;
 import android.app.ProgressDialog;
 import android.app.SearchManager;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
@@ -22,6 +23,7 @@ import android.widget.ListView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.SearchView;
 import androidx.constraintlayout.widget.ConstraintLayout;
@@ -147,6 +149,30 @@ public class MainActivity extends AppCompatActivity implements OnChangeContact {
                 type = 3;
                 invalidateOptionsMenu();
                 btnAdd.hide();
+            }
+        });
+
+        lvContact.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+            @Override
+            public boolean onItemLongClick(AdapterView<?> adapterView, View view, final int i1, long l) {
+                new AlertDialog.Builder(MainActivity.this)
+                        .setIcon(android.R.drawable.ic_dialog_alert)
+                        .setMessage(R.string.sure_delete)
+                        .setPositiveButton(R.string.yes, new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                int i = db.deleteContact(listContact.get(i1));
+                                if (i > 0) {
+                                    Utils.showSnackbar(getString(R.string.delete_success),snackbar,layout);
+                                    listContact = db.getContact();
+                                    listContactAdapter = new ListContactAdapter(listContact, MainActivity.this);
+                                    lvContact.setAdapter(listContactAdapter);
+                                }
+                            }
+                        })
+                        .setNegativeButton(R.string.no, null)
+                        .show();
+                return true;
             }
         });
     }
