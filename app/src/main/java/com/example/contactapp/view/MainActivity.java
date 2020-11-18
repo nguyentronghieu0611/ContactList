@@ -69,7 +69,6 @@ public class MainActivity extends AppCompatActivity implements OnChangeContact {
     FloatingActionButton btnAdd;
     List<Contact> listContact = new ArrayList<>();
     ListView lvContact;
-    private final int READ_STORAGE = 146;
     private final int WRITE_STORAGE = 178;
     private int type = 1;
     private ListContactAdapter listContactAdapter;
@@ -91,16 +90,7 @@ public class MainActivity extends AppCompatActivity implements OnChangeContact {
         final FragmentManager fragmentManager = getSupportFragmentManager();
         initControl();
         bindEvent(fragmentManager);
-        int permissionCheckREAD = ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE);
         int permissionCheckWrite = ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE);
-
-        if (permissionCheckREAD != PackageManager.PERMISSION_GRANTED) {
-            ActivityCompat.requestPermissions(
-                    this,
-                    new String[]{Manifest.permission.READ_EXTERNAL_STORAGE},
-                    READ_STORAGE);
-        }
-
         if (permissionCheckWrite != PackageManager.PERMISSION_GRANTED) {
             ActivityCompat.requestPermissions(
                     this,
@@ -339,14 +329,7 @@ public class MainActivity extends AppCompatActivity implements OnChangeContact {
 
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        if (requestCode == READ_STORAGE) {
-            if ((grantResults.length > 0) && (grantResults[0] == PackageManager.PERMISSION_GRANTED)) {
-//                Intent intent = new Intent(Intent.ACTION_CALL, Uri.parse("tel:" + contact.phonenummber));
-//                startActivity(intent);
-            } else {
-                Utils.showSnackbar(getString(R.string.please_grant_read),snackbar,layout);
-            }
-        } else if (requestCode == WRITE_STORAGE) {
+        if (requestCode == WRITE_STORAGE) {
             if ((grantResults.length > 0) && (grantResults[0] == PackageManager.PERMISSION_GRANTED)) {
 //                startActivity(new Intent(Intent.ACTION_VIEW, Uri.fromParts("sms", contact.phonenummber, null)));
             } else {
